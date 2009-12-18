@@ -1,0 +1,247 @@
+<html>
+
+<head>
+<title>Planet Generation</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<script type="text/javascript" src="sylvester.js"></script>
+<script type="text/javascript" src="glUtils.js"></script>
+<script type="text/javascript" src="glInit.js"></script>
+<script type="text/javascript" src="glCore.js"></script>
+
+<script type="text/javascript" src="particle_terrain.js"></script>
+<script type="text/javascript" src="planet.js"></script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+	varying vec4 vColor;
+	varying vec3 vLightWeighting;
+	
+	void main(void) {
+		//gl_FragColor = vec4(1,1,1,1);
+		gl_FragColor = vColor * vec4( vLightWeighting.xyz, 1.0 );
+	}
+</script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+	attribute vec3 aVertexPosition;
+	attribute vec4 aVertexNormal;
+	attribute vec4 aVertexColor;
+	
+	uniform mat4 uMVMatrix;
+	uniform mat4 uPMatrix;
+	uniform mat4 uNMatrix;
+
+	varying vec4 vColor;
+	
+	varying vec3 vLightWeighting;
+
+	void main(void) {
+		
+		vec3 uAmbientColor = vec3( 0.2, 0.2, 0.2 );
+		vec3 uDirectionalColor = vec3( 0.8, 0.8, 0.8 );
+		vec3 uLightingDirection = vec3( 0, 1, 0 );
+		
+		gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+		gl_PointSize = 2.0;
+		//vLightWeighting = vec3(1.0, 1.0, 1.0);
+		vec4 transformedNormal = uNMatrix * vec4(aVertexNormal.xyz, 1.0);
+		float directionalLightWeighting = max(dot(transformedNormal.xyz, uLightingDirection), 0.0);
+		vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;
+		vColor = aVertexColor;
+	}	
+</script>
+
+
+<script type="application/x-javascript">
+	// This code is for Firefox/Minefield compatibility.  WebGL
+	// originally used a class called CanvasFloatArray, but the
+	// specification has now changed, and it's called WebGLFloatArray.
+	// Firefox/Minefield still (as of 13 Nov 2009) uses the old
+	// name, but WebKit/Safari uses the new one.  The main WebGL
+	// code in this page uses the new name, but the compatibility
+	// code that follows will stay here for the time being to make
+	// sure that Firefox users can view the page.
+	try {
+		WebGLFloatArray;
+	} catch (e) {
+		try {
+			WebGLArrayBuffer = CanvasArrayBuffer;
+			WebGLByteArray = CanvasByteArray;
+			WebGLUnsignedByteArray = CanvasUnsignedByteArray;
+			WebGLShortArray = CanvasShortArray;
+			WebGLUnsignedShortArray = CanvasUnsignedShortArray;
+			WebGLIntArray = CanvasIntArray;
+			WebGLUnsignedIntArray = CanvasUnsignedIntArray;
+			WebGLFloatArray = CanvasFloatArray;
+		} catch (e) {
+			alert("Could not find Canvas array types for WebGL.");
+		}
+	}
+	// End of compatibility code
+
+	function getShader(gl, id) {
+		var shaderScript = document.getElementById(id);
+		if (!shaderScript) {
+			return null;
+		}
+
+		var str = "";
+		var k = shaderScript.firstChild;
+		while (k) {
+
+			if (k.nodeType == 3) {
+				str += k.textContent;
+			}
+			k = k.nextSibling;
+			
+		}
+
+		var shader;
+		if ( shaderScript.type == "x-shader/x-fragment" ) {
+			shader = gl.createShader(gl.FRAGMENT_SHADER);
+		} else if ( shaderScript.type == "x-shader/x-vertex" ) {
+			shader = gl.createShader(gl.VERTEX_SHADER);
+		} else {
+			return null;
+		}
+
+		gl.shaderSource( shader, str );
+		gl.compileShader( shader );
+
+		if ( !gl.getShaderParameter( shader, gl.COMPILE_STATUS ) ) {
+			alert(gl.getShaderInfoLog(shader));
+			return null;
+		}
+		
+		return shader;
+	}
+
+	var shaderProgram;
+	var vertexPositionAttribute;
+	var vertexNormalAttribute;
+	var vertexColorAttribute;
+	function initShaders() {
+		var fragmentShader = getShader(gl, "shader-fs");
+		var vertexShader = getShader(gl, "shader-vs");
+
+		shaderProgram = gl.createProgram();
+		gl.attachShader(shaderProgram, vertexShader);
+		gl.attachShader(shaderProgram, fragmentShader);
+    	gl.linkProgram(shaderProgram);
+
+		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+			alert("Could not initialise shaders");
+		}
+
+		gl.useProgram(shaderProgram);
+
+		vertexPositionAttribute = gl.getAttribLocation( shaderProgram, "aVertexPosition" );
+		gl.enableVertexAttribArray( vertexPositionAttribute );
+		
+		vertexNormalAttribute = gl.getAttribLocation( shaderProgram, "aVertexNormal" );
+		gl.enableVertexAttribArray( vertexNormalAttribute );
+		
+		vertexColorAttribute = gl.getAttribLocation( shaderProgram, "aVertexColor" );
+		gl.enableVertexAttribArray( vertexColorAttribute );
+	}
+
+	var vertexBuffer;
+	var indexBuffer;
+	var normalBuffer;
+	var colorBuffer;
+	function initBuffers() {
+		vertexBuffer = gl.createBuffer();
+		gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
+		
+		var planet = new Planet( 129 );
+		var planetData = planet.generate();
+		
+		gl.bufferData(gl.ARRAY_BUFFER, new WebGLFloatArray( planetData.vertices ), gl.STATIC_DRAW);
+		vertexBuffer.itemSize = 3;
+		vertexBuffer.numItems = planetData.vertices.length/3;
+		
+		colorBuffer = gl.createBuffer();
+		gl.bindBuffer( gl.ARRAY_BUFFER, colorBuffer );
+		gl.bufferData( gl.ARRAY_BUFFER, new WebGLFloatArray( planetData.colors ), gl.STATIC_DRAW );
+		colorBuffer.itemSize = 4;
+		colorBuffer.numItems = planetData.colors.length/4;
+		
+		normalBuffer = gl.createBuffer();
+		gl.bindBuffer( gl.ARRAY_BUFFER, normalBuffer );
+		gl.bufferData( gl.ARRAY_BUFFER, new WebGLFloatArray( planetData.normals ), gl.STATIC_DRAW );
+		normalBuffer.itemSize = 3;
+		normalBuffer.numItems = planetData.normals.length/3;
+		
+		indexBuffer = gl.createBuffer();
+		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
+		gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new WebGLUnsignedShortArray( planetData.indices ), gl.STATIC_DRAW);
+		indexBuffer.itemSize = 1;
+		indexBuffer.numItems = planetData.indices.length;
+	}
+
+	var yRot = -180, ySpeed = -50;
+	function drawScene() {
+		gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		
+		perspective( 60, 800/640, 0.1, 1000.0 );
+		
+		loadIdentity();
+		
+		lookAt( 0, 0, 500, 0, 0, 0, 0, 1, 0 );
+		
+		mvRotate( yRot, [0, 1, 0 ] );
+
+	    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+	    gl.vertexAttribPointer(vertexPositionAttribute, vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	
+	    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+	    gl.vertexAttribPointer(vertexNormalAttribute, normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+	
+		gl.bindBuffer( gl.ARRAY_BUFFER, colorBuffer );
+		gl.vertexAttribPointer( vertexColorAttribute, colorBuffer.itemSize, gl.FLOAT, false, 0, 0 );
+
+		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
+	    setMatrixUniforms();
+		gl.drawElements( gl.TRIANGLES, indexBuffer.numItems, gl.UNSIGNED_SHORT, 0 );
+	    //gl.drawArrays(gl.POINTS, 0, vertexBuffer.numItems);
+	}
+	
+	var lastTime = 0;
+	function animate() {
+		var timeNow = new Date().getTime();
+		if( lastTime != 0 ) {
+			var elapsed = timeNow - lastTime;
+	      	yRot += (ySpeed * elapsed) / 1000.0;
+		}
+		lastTime = timeNow;
+	}
+	
+	function tick() {
+		drawScene();
+		animate();
+	}
+	
+	function webGLStart() {
+		var canvas = document.getElementById("pgenerator-canvas");
+		initGL(canvas);
+		initShaders();
+		
+		gl.clearColor(0.0, 0.0, 0.0, 1.0);
+		gl.clearDepth(1.0);
+		gl.enable( gl.DEPTH_TEST );
+		gl.enable( gl.POLYGON_SMOOTH )
+		
+		// Enable point size
+		gl.enable( 0x8642 );
+		gl.depthFunc(gl.LEQUAL);
+		
+		initBuffers();
+		setInterval(tick, 15);
+	}
+</script>
+</head>
+<body onload="webGLStart()">
+	<canvas id="pgenerator-canvas" style="border: none;" width="800" height="640"></canvas>
+	<div id='log'></div>
+</body>
+</html>
