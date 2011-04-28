@@ -13,6 +13,9 @@
 <script type="text/javascript" src="planet.js"></script>
 
 <script id="shader-fs" type="x-shader/x-fragment">
+#ifdef GL_ES
+precision highp float;
+#endif
 	varying vec4 vColor;
 	varying vec3 vLightWeighting;
 	
@@ -55,14 +58,14 @@
 <script type="application/x-javascript">
 	// This code is for Firefox/Minefield compatibility.  WebGL
 	// originally used a class called CanvasFloatArray, but the
-	// specification has now changed, and it's called WebGLFloatArray.
+	// specification has now changed, and it's called Float32Array.
 	// Firefox/Minefield still (as of 13 Nov 2009) uses the old
 	// name, but WebKit/Safari uses the new one.  The main WebGL
 	// code in this page uses the new name, but the compatibility
 	// code that follows will stay here for the time being to make
 	// sure that Firefox users can view the page.
 	try {
-		WebGLFloatArray;
+		Float32Array;
 	} catch (e) {
 		try {
 			WebGLArrayBuffer = CanvasArrayBuffer;
@@ -72,9 +75,9 @@
 			WebGLUnsignedShortArray = CanvasUnsignedShortArray;
 			WebGLIntArray = CanvasIntArray;
 			WebGLUnsignedIntArray = CanvasUnsignedIntArray;
-			WebGLFloatArray = CanvasFloatArray;
+			Float32Array = CanvasFloatArray;
 		} catch (e) {
-			alert("Could not find Canvas array types for WebGL.");
+			console.log("Could not find Canvas array types for WebGL.");
 		}
 	}
 	// End of compatibility code
@@ -109,7 +112,7 @@
 		gl.compileShader( shader );
 
 		if ( !gl.getShaderParameter( shader, gl.COMPILE_STATUS ) ) {
-			alert(gl.getShaderInfoLog(shader));
+			console.log(gl.getShaderInfoLog(shader));
 			return null;
 		}
 		
@@ -130,7 +133,7 @@
     	gl.linkProgram(shaderProgram);
 
 		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-			alert("Could not initialise shaders");
+		  console.log("Could not initialise shaders");
 		}
 
 		gl.useProgram(shaderProgram);
@@ -156,25 +159,25 @@
 		var planet = new Planet( 129 );
 		var planetData = planet.generate();
 		
-		gl.bufferData(gl.ARRAY_BUFFER, new WebGLFloatArray( planetData.vertices ), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array( planetData.vertices ), gl.STATIC_DRAW);
 		vertexBuffer.itemSize = 3;
 		vertexBuffer.numItems = planetData.vertices.length/3;
 		
 		colorBuffer = gl.createBuffer();
 		gl.bindBuffer( gl.ARRAY_BUFFER, colorBuffer );
-		gl.bufferData( gl.ARRAY_BUFFER, new WebGLFloatArray( planetData.colors ), gl.STATIC_DRAW );
+		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( planetData.colors ), gl.STATIC_DRAW );
 		colorBuffer.itemSize = 4;
 		colorBuffer.numItems = planetData.colors.length/4;
 		
 		normalBuffer = gl.createBuffer();
 		gl.bindBuffer( gl.ARRAY_BUFFER, normalBuffer );
-		gl.bufferData( gl.ARRAY_BUFFER, new WebGLFloatArray( planetData.normals ), gl.STATIC_DRAW );
+		gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( planetData.normals ), gl.STATIC_DRAW );
 		normalBuffer.itemSize = 3;
 		normalBuffer.numItems = planetData.normals.length/3;
 		
 		indexBuffer = gl.createBuffer();
 		gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
-		gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new WebGLUnsignedShortArray( planetData.indices ), gl.STATIC_DRAW);
+		gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array( planetData.indices ), gl.STATIC_DRAW);
 		indexBuffer.itemSize = 1;
 		indexBuffer.numItems = planetData.indices.length;
 	}
