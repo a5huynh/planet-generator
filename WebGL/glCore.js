@@ -43,13 +43,13 @@ function lookAt( ex, ey, ez, cx, cy, cz, ux, uy, uz ) {
 
 function setMatrixUniforms() {
 	var pUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-	gl.uniformMatrix4fv( pUniform, false, new WebGLFloatArray( document.gl.pMatrix.flatten() ) );
+	gl.uniformMatrix4fv( pUniform, false, new Float32Array( document.gl.pMatrix.flatten() ) );
 	
 	var mvUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
-	gl.uniformMatrix4fv( mvUniform, false, new WebGLFloatArray( document.gl.mvMatrix.flatten() ) );
+	gl.uniformMatrix4fv( mvUniform, false, new Float32Array( document.gl.mvMatrix.flatten() ) );
 	
 	var normalMatrix = document.gl.mvMatrix.inverse();
 	normalMatrix = normalMatrix.transpose();
 	var nUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
-	gl.uniformMatrix4fv(nUniform, false, new WebGLFloatArray(normalMatrix.flatten()));	
+	gl.uniformMatrix4fv(nUniform, false, new Float32Array(normalMatrix.flatten()));	
 }
