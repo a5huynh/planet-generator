@@ -18,7 +18,7 @@ function initGL(canvas) {
 	}
 
 	if (!gl) {
-		alert("Could not initialise WebGL, sorry :-(");
+		console.log("Could not initialise WebGL, sorry :-(");
 	}
 
 	// This temporary code provides support for Google Chrome, which
