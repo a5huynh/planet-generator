@@ -30,7 +30,7 @@ Planet::Planet() {
 	genNormals();
 	printf("Planet & Normal Generation: %fs\n", ( (float)clock() - bm2 ) / CLOCKS_PER_SEC );
 	printf("Total Generation Time: %fs\n", ( (float)clock() - bm ) / CLOCKS_PER_SEC );
-	printf("Polygon Count: %d\n", land.size() / 2 );
+	printf("Polygon Count: %lu\n", land.size() / 2 );
 			
 	// Cleanup
 	for( int i = 0; i < normals.size(); i++ )
@@ -56,7 +56,7 @@ Planet::Planet( int s ) {
 	genNormals();
 	printf("Planet & Normal Generation: %fs\n", ( (float)clock() - bm2 ) / CLOCKS_PER_SEC );
 	printf("Total Generation Time: %fs\n", ( (float)clock() - bm ) / CLOCKS_PER_SEC );
-	printf("Polygon Count: %d\n", land.size() / 2 );
+	printf("Polygon Count: %lu\n", land.size() / 2 );
 		
 	// Cleanup
 	for( int i = 0; i < normals.size(); i++ )
