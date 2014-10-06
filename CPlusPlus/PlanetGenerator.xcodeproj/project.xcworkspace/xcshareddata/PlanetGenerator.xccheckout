@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>D5AD8E18-757D-4B7E-8EE6-2F23CD4BC47F</string>
+	<key>IDESourceControlProjectName</key>
+	<string>PlanetGenerator</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>718D07B7E1FCD62DF8CAEDB42BEF1AFF14B1600A</key>
+		<string>https://github.com/a5huynh/planet-generator.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>CPlusPlus/PlanetGenerator.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>718D07B7E1FCD62DF8CAEDB42BEF1AFF14B1600A</key>
+		<string>../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/a5huynh/planet-generator.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>718D07B7E1FCD62DF8CAEDB42BEF1AFF14B1600A</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>718D07B7E1FCD62DF8CAEDB42BEF1AFF14B1600A</string>
+			<key>IDESourceControlWCCName</key>
+			<string>planet-generator</string>
+		</dict>
+	</array>
+</dict>
+</plist>

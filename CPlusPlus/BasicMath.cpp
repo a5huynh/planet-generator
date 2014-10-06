@@ -7,7 +7,6 @@
 
 #include "BasicMath.h"
 #include <math.h>
-#include <algo.h>
 
 float deg2rad( float deg ) {
 	return deg * PI / 180;
@@ -48,18 +47,18 @@ bool intersects( Vector3& seg1_a, Vector3& seg1_b, Vector3& seg2_a, Vector3& seg
 	
 	int maxX, minX, maxY, minY;
 	// Check to see if point is in bounding box of each line segment
-	maxX = max( seg1_a.getX(), seg1_b.getX() );
-	minX = min( seg1_a.getX(), seg1_b.getX() );
-	maxY = max( seg1_a.getY(), seg1_b.getY() );
-	minY = min( seg1_a.getY(), seg1_b.getY() );
+	maxX = fmax( seg1_a.getX(), seg1_b.getX() );
+	minX = fmin( seg1_a.getX(), seg1_b.getX() );
+	maxY = fmax( seg1_a.getY(), seg1_b.getY() );
+	minY = fmin( seg1_a.getY(), seg1_b.getY() );
 	
 	if( x < minX || x > maxX || y < minY || y > maxY )
 		return false;
 
-	maxX = max( seg2_a.getX(), seg2_b.getX() );
-	minX = min( seg2_a.getX(), seg2_b.getX() );
-	maxY = max( seg2_a.getY(), seg2_b.getY() );
-	minY = min( seg2_a.getY(), seg2_b.getY() );
+	maxX = fmax( seg2_a.getX(), seg2_b.getX() );
+	minX = fmin( seg2_a.getX(), seg2_b.getX() );
+	maxY = fmax( seg2_a.getY(), seg2_b.getY() );
+	minY = fmin( seg2_a.getY(), seg2_b.getY() );
 	
 	if( x < minX || x > maxX || y < minY || y > maxY )
 		return false;
