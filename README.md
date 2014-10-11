@@ -1,6 +1,7 @@
 ## planet generator
 
 __Author__: Andrew Huynh
+
 __License__: MIT
 
 ### a little history
