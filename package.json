@@ -1,0 +1,31 @@
+{
+  "name": "planet-generator",
+  "version": "0.0.1",
+  "description": "Generate a planet using WebGL",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./node_modules/.bin/webpack",
+    "watch": "./node_modules/.bin/webpack --progress --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/a5huynh/planet-generator.git"
+  },
+  "author": "Andrew Huynh <a5thuynh@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/a5huynh/planet-generator/issues"
+  },
+  "homepage": "https://github.com/a5huynh/planet-generator#readme",
+  "devDependencies": {
+    "@types/three": "^0.84.3",
+    "awesome-typescript-loader": "^3.1.2",
+    "ts-node": "^3.0.2",
+    "typedoc": "^0.5.9",
+    "webpack": "^2.3.2"
+  },
+  "dependencies": {
+    "three.js": "^0.77.1"
+  }
+}
