@@ -1,12 +1,13 @@
 import * as THREE from 'three';
-
+import { Planet } from './geometry/planet';
 
 class TheScene {
 
     private camera: THREE.PerspectiveCamera;
     private scene: THREE.Scene;
     private renderer: THREE.WebGLRenderer;
-    private box: THREE.Mesh;
+    private planet: Planet;
+    private mesh: THREE.Mesh;
 
     constructor() {
         this.scene = new THREE.Scene();
@@ -31,25 +32,21 @@ class TheScene {
 
         // add lights
         let light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
-
         light.position.set( 100, 100, 100 );
         this.scene.add( light );
 
-        let light2 = new THREE.DirectionalLight (0xFFFFFF, 1.0 );
-        light2.position.set(-100, 100, -100);
-        this.scene.add(light2);
-
-        let material = new THREE.MeshBasicMaterial({
-            color: 0xaaaaaa,
-            wireframe: true
+        let material = new THREE.MeshPhongMaterial({
+            color: 0x0000ff
         });
 
-        // create a box and add it to the scene
-        this.box = new THREE.Mesh( new THREE.BoxGeometry(1, 1, 1), material );
-        this.scene.add( this.box );
+        this.planet = new Planet();
 
-        this.box.position.x = 0.5;
-        this.box.rotation.y = 0.5;
+        // create a box and add it to the scene
+        this.mesh = new THREE.Mesh( this.planet.geometry, material );
+        this.scene.add( this.mesh );
+
+        this.mesh.position.x = 0.5;
+        this.mesh.rotation.y = 0.5;
 
         this.camera.position.x = 5;
         this.camera.position.y = 5;
@@ -64,7 +61,7 @@ class TheScene {
     }
 
     render = () => {
-        this.box.rotation.x += 0.1;
+        this.mesh.rotation.x += 0.01;
         this.renderer.render( this.scene, this.camera );
     }
 }
