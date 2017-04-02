@@ -143,11 +143,13 @@ class Planet {
     }
 
     _normalizedVector( x: number, y: number, z:number ) {
+
         let length = Math.sqrt( x * x + y * y + z * z );
+
         return new THREE.Vector3(
-            x / length,
-            y / length,
-            z / length
+            x / length * this.radius,
+            y / length * this.radius,
+            z / length * this.radius
         );
     }
 }
