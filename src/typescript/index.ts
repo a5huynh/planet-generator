@@ -39,7 +39,7 @@ class TheScene {
             color: 0x0000ff
         });
 
-        this.planet = new Planet();
+        this.planet = new Planet( 1.0 );
 
         // create a box and add it to the scene
         this.mesh = new THREE.Mesh( this.planet.geometry, material );
