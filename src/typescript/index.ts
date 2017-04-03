@@ -7,12 +7,12 @@ class TheScene {
     private scene: THREE.Scene;
     private renderer: THREE.WebGLRenderer;
     private planet: Planet;
-    private mesh: THREE.Mesh;
+    private mesh: THREE.Object3D;
 
     constructor() {
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-        this.renderer = new THREE.WebGLRenderer();
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
 
         // When the window is resized, resize the renderer and camera.
         window.addEventListener( "resize", ( event ) => {
@@ -31,25 +31,26 @@ class TheScene {
         document.body.appendChild( this.renderer.domElement );
 
         // add lights
-        let light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
-        light.position.set( 100, 100, 100 );
+        let light = new THREE.AmbientLight( 0x404040 );
         this.scene.add( light );
 
-        let material = new THREE.MeshPhongMaterial({
-            color: 0x0000ff
-        });
+        light = new THREE.DirectionalLight( 0xffffff );
+        light.position.set( 5, 5, 0 );
+        this.scene.add( light );
 
-        this.planet = new Planet( 1.0 );
+        let materials = [
+            new THREE.MeshPhongMaterial({ color: 0x0099FF, shading: THREE.FlatShading, shininess: 0 }),
+            new THREE.MeshBasicMaterial({ color: 0x55bbff, shading: THREE.FlatShading, wireframe: true })
+        ]
+
+        this.planet = new Planet( 2.0 );
 
         // create a box and add it to the scene
-        this.mesh = new THREE.Mesh( this.planet.geometry, material );
+        this.mesh = THREE.SceneUtils.createMultiMaterialObject( this.planet.geometry, materials );
         this.scene.add( this.mesh );
 
-        this.mesh.position.x = 0.5;
-        this.mesh.rotation.y = 0.5;
-
         this.camera.position.x = 5;
-        this.camera.position.y = 5;
+        this.camera.position.y = 0;
         this.camera.position.z = 5;
 
         this.camera.lookAt( this.scene.position )
@@ -61,7 +62,7 @@ class TheScene {
     }
 
     render = () => {
-        this.mesh.rotation.x += 0.01;
+        this.mesh.rotation.y += 0.01;
         this.renderer.render( this.scene, this.camera );
     }
 }
