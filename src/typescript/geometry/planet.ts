@@ -2,12 +2,12 @@ import * as THREE from 'three';
 
 
 /**
- * Planet generator class.
+ * IsoPlanet generator class.
  *
  * This object encapsulates everything that is needed to generate a random planet
  * using particle deposition and an icosahedron geometry.
  */
-class Planet {
+class IsoPlanet {
 
     /**
      * radius of the planet.
@@ -154,4 +154,4 @@ class Planet {
     }
 }
 
-export { Planet };
+export { IsoPlanet };

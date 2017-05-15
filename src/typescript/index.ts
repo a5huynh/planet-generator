@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import { Planet } from './geometry/planet';
+import { IsoPlanet } from './geometry/planet';
 
 class TheScene {
 
     private camera: THREE.PerspectiveCamera;
     private scene: THREE.Scene;
     private renderer: THREE.WebGLRenderer;
-    private planet: Planet;
+    private planet: IsoPlanet;
     private mesh: THREE.Object3D;
 
     constructor() {
@@ -43,7 +43,7 @@ class TheScene {
             new THREE.MeshBasicMaterial({ color: 0x55bbff, shading: THREE.FlatShading, wireframe: true })
         ]
 
-        this.planet = new Planet( 2.0 );
+        this.planet = new IsoPlanet( 2.0 );
 
         // create a box and add it to the scene
         this.mesh = THREE.SceneUtils.createMultiMaterialObject( this.planet.geometry, materials );
