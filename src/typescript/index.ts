@@ -1,12 +1,13 @@
 import * as THREE from 'three';
-import { IsoPlanet } from './geometry/planet';
+import { Planet, IsoPlanet, UVPlanet } from './geometry/planet';
 
 class TheScene {
 
     private camera: THREE.PerspectiveCamera;
     private scene: THREE.Scene;
     private renderer: THREE.WebGLRenderer;
-    private planet: IsoPlanet;
+    private planet: Planet;
+
     private mesh: THREE.Object3D;
 
     constructor() {
@@ -49,7 +50,7 @@ class TheScene {
         this.mesh = THREE.SceneUtils.createMultiMaterialObject( this.planet.geometry, materials );
         this.scene.add( this.mesh );
 
-        this.camera.position.x = 5;
+        this.camera.position.x = 0;
         this.camera.position.y = 0;
         this.camera.position.z = 5;
 
