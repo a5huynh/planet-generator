@@ -1,7 +1,16 @@
 import * as THREE from 'three';
 import { Planet, IsoPlanet, UVPlanet } from './geometry/planet';
+import { getParameterByName } from './utils';
+
+
+interface SceneConfig {
+    sphereType: string;
+}
+
 
 class TheScene {
+
+    private sceneConfig : SceneConfig;
 
     private camera: THREE.PerspectiveCamera;
     private scene: THREE.Scene;
@@ -10,7 +19,10 @@ class TheScene {
 
     private mesh: THREE.Object3D;
 
-    constructor() {
+    constructor( config: SceneConfig = { sphereType: 'iso' } ) {
+
+        this.sceneConfig = config;
+
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -44,8 +56,12 @@ class TheScene {
             new THREE.MeshBasicMaterial({ color: 0x55bbff, shading: THREE.FlatShading, wireframe: true })
         ]
 
-        this.planet = new IsoPlanet( 2.0 );
-
+        if( this.sceneConfig.sphereType == 'iso' ) {
+            this.planet = new IsoPlanet( 2.0 );
+        } else {
+            this.planet = new UVPlanet( 2.0 );
+        }
+``
         // create a box and add it to the scene
         this.mesh = THREE.SceneUtils.createMultiMaterialObject( this.planet.geometry, materials );
         this.scene.add( this.mesh );
@@ -68,4 +84,6 @@ class TheScene {
     }
 }
 
-let app = new TheScene();
+let app = new TheScene({
+    sphereType: getParameterByName( 'sphereType', window.location.href )
+});
