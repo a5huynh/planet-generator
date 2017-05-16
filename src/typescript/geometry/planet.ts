@@ -1,13 +1,19 @@
 import * as THREE from 'three';
 
 
+interface Planet {
+    radius: number;
+    geometry: THREE.Geometry;
+}
+
+
 /**
  * IsoPlanet generator class.
  *
  * This object encapsulates everything that is needed to generate a random planet
  * using particle deposition and an icosahedron geometry.
  */
-class IsoPlanet {
+class IsoPlanet implements Planet {
 
     /**
      * radius of the planet.
@@ -22,7 +28,6 @@ class IsoPlanet {
     private faces: Array<THREE.Face3>;
 
     constructor( radius: number ) {
-
         this.faces = new Array();
         this.radius = radius;
         this.geometry = new THREE.Geometry();
@@ -143,15 +148,92 @@ class IsoPlanet {
     }
 
     _normalizedVector( x: number, y: number, z:number ) {
-
-        let length = Math.sqrt( x * x + y * y + z * z );
-
-        return new THREE.Vector3(
-            x / length * this.radius,
-            y / length * this.radius,
-            z / length * this.radius
-        );
+        return new THREE.Vector3( x, y, z ).normalize().multiplyScalar( this.radius );
     }
 }
 
-export { IsoPlanet };
+
+/**
+ * UVPlanet generator class.
+ * This object encapsulates everything that is needed to generate a random planet
+ * using particle deposition and an uv-sphere geometry.
+ */
+class UVPlanet implements Planet {
+    public radius: number;
+    public geometry: THREE.Geometry;
+
+    private twidth = 32;
+
+    constructor( radius: number ) {
+
+        this.radius = radius;
+        this.geometry = new THREE.Geometry();
+
+        this._setupVertices( 20 );
+        this.geometry.computeFaceNormals();
+        this.geometry.computeVertexNormals();
+
+    }
+
+    /**
+     * Converts a spherical coordinate <theta, gamma) into carteisian
+     * coordinates. See: http://mathworld.wolfram.com/SphericalCoordinates.html
+     *
+     * @param theta Azimuthal angle in the x-y plane.
+     * @param gamma Polar angel in the z-y plane.
+     */
+    _vertex( theta: number, gamma: number ): THREE.Vector3 {
+
+        var x = Math.sin( theta ) * Math.cos( gamma );
+        var y = Math.sin( theta ) * Math.sin( gamma );
+        var z = Math.cos( theta );
+
+        return new THREE.Vector3( x, y, z )
+                        .normalize()
+                        .multiplyScalar( this.radius );
+    }
+
+    _setupVertices( detail: number ) {
+
+        // Horizontal steps
+        var gamma = 0.0;
+        var gammaStep = 2 * Math.PI / detail;
+
+        // Vertical steps
+        var theta = 0.0;
+        var thetaStep = Math.PI / detail;
+
+        // Number of points is the number of sides + 1
+        var numPoints = detail + 1;
+
+        for( var row = 0; row < numPoints; row++ ) {
+            // Vertical points
+            gamma = row * gammaStep;
+            for( var col = 0; col < numPoints; col++ ) {
+                // Horizontal
+                theta = col * thetaStep;
+                this.geometry.vertices.push( this._vertex( theta, gamma ) );
+            }
+        }
+
+        // Generate faces
+        for( var row = 0; row < numPoints; row++ ) {
+            for( var col = 0; col < numPoints; col++ ) {
+
+                // Bottom left
+                var bl = row * numPoints + col;
+                // Bottom right
+                var br = ( bl + 1 ) % ( numPoints * numPoints );
+                // Top left
+                var tl = ( (row + 1) % numPoints ) * numPoints + col;
+                // Top right
+                var tr = ( tl + 1 ) % ( numPoints * numPoints );
+
+                this.geometry.faces.push( new THREE.Face3( bl, tr, tl ) );
+                this.geometry.faces.push( new THREE.Face3( bl, br, tr ) );
+            }
+        }
+    }
+}
+
+export { Planet, IsoPlanet, UVPlanet };
