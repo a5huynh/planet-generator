@@ -1,11 +1,13 @@
 import * as THREE from 'three';
-
+import { TerrainGenerator } from '../terrain/base';
 
 interface Planet {
+
     radius: number;
     geometry: THREE.Geometry;
-}
 
+    generate( generator: TerrainGenerator ): void;
+}
 
 /**
  * IsoPlanet generator class.
@@ -15,26 +17,22 @@ interface Planet {
  */
 class IsoPlanet implements Planet {
 
-    /**
-     * radius of the planet.
-     */
-    public radius: number;
-
-    /**
-     * planet geometry
-     */
     public geometry: THREE.Geometry;
-
     private faces: Array<THREE.Face3>;
+    private terrain: TerrainGenerator;
 
-    constructor( radius: number ) {
+    constructor( public radius: number, public detail: number ) {
         this.faces = new Array();
-        this.radius = radius;
         this.geometry = new THREE.Geometry();
+    }
+
+    generate( terrain: TerrainGenerator ) {
+        this.terrain = terrain;
+        this.terrain.initialize( 10, 10 );
 
         this._setupInitialVertices();
         this._setupInitialFaces();
-        this._refineGeometry( 2 );
+        this._refineGeometry();
 
         for( let face of this.faces ) {
             this.geometry.faces.push( face );
@@ -44,9 +42,9 @@ class IsoPlanet implements Planet {
         this.geometry.computeVertexNormals();
     }
 
-    _refineGeometry( detail: number ) {
+    _refineGeometry() {
 
-        for( var i = 0; i < detail; i++ ) {
+        for( var i = 0; i < this.detail; i++ ) {
 
             let refinedFaces = new Array<THREE.Face3>();
 
@@ -159,20 +157,21 @@ class IsoPlanet implements Planet {
  * using particle deposition and an uv-sphere geometry.
  */
 class UVPlanet implements Planet {
-    public radius: number;
+
     public geometry: THREE.Geometry;
+    private terrain: TerrainGenerator;
 
-    private twidth = 32;
-
-    constructor( radius: number ) {
-
-        this.radius = radius;
+    constructor( public radius: number, public detail: number ) {
         this.geometry = new THREE.Geometry();
+    }
 
-        this._setupVertices( 20 );
+    generate( terrain: TerrainGenerator ) {
+        this.terrain = terrain;
+        this.terrain.initialize( this.detail + 1, this.detail + 1);
+
+        this._setupVertices( this.detail );
         this.geometry.computeFaceNormals();
         this.geometry.computeVertexNormals();
-
     }
 
     /**
@@ -181,16 +180,16 @@ class UVPlanet implements Planet {
      *
      * @param theta Azimuthal angle in the x-y plane.
      * @param gamma Polar angel in the z-y plane.
+     * @param height Height of this vertice.
      */
-    _vertex( theta: number, gamma: number ): THREE.Vector3 {
+    _vertex( theta: number, gamma: number, height: number ): THREE.Vector3 {
 
         var x = Math.sin( theta ) * Math.cos( gamma );
-        var y = Math.sin( theta ) * Math.sin( gamma );
-        var z = Math.cos( theta );
+        var y = Math.cos( theta );
+        var z = Math.sin( theta ) * Math.sin( gamma );
 
-        return new THREE.Vector3( x, y, z )
-                        .normalize()
-                        .multiplyScalar( this.radius );
+        return new THREE.Vector3( x, y, z ).normalize()
+                        .multiplyScalar( height );
     }
 
     _setupVertices( detail: number ) {
@@ -212,7 +211,9 @@ class UVPlanet implements Planet {
             for( var col = 0; col < numPoints; col++ ) {
                 // Horizontal
                 theta = col * thetaStep;
-                this.geometry.vertices.push( this._vertex( theta, gamma ) );
+                // Add vertice
+                let height = this.radius + this.terrain.getHeight( row, col );
+                this.geometry.vertices.push( this._vertex( theta, gamma, height ));
             }
         }
 
@@ -220,17 +221,17 @@ class UVPlanet implements Planet {
         for( var row = 0; row < numPoints; row++ ) {
             for( var col = 0; col < numPoints; col++ ) {
 
-                // Bottom left
-                var bl = row * numPoints + col;
-                // Bottom right
-                var br = ( bl + 1 ) % ( numPoints * numPoints );
-                // Top left
-                var tl = ( (row + 1) % numPoints ) * numPoints + col;
                 // Top right
-                var tr = ( tl + 1 ) % ( numPoints * numPoints );
+                var i0 = row * numPoints + col;
+                // Bottom right
+                var i1 = ( i0 + 1 ) % ( numPoints * numPoints );
+                // Top left
+                var i2 = ( (row + 1) % numPoints ) * numPoints + col;
+                // Bottom left
+                var i3 = ( i2 + 1 ) % ( numPoints * numPoints );
 
-                this.geometry.faces.push( new THREE.Face3( bl, tr, tl ) );
-                this.geometry.faces.push( new THREE.Face3( bl, br, tr ) );
+                this.geometry.faces.push( new THREE.Face3( i0, i3, i1 ) );
+                this.geometry.faces.push( new THREE.Face3( i0, i2, i3 ) );
             }
         }
     }
