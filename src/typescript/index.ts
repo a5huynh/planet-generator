@@ -25,12 +25,6 @@ interface SceneConfig {
     particleNumIslands: number;
 }
 
-let TERRAIN_GENERATORS: {[index:string]: TerrainGenerator} = {
-    'random': new RandomTerrain(),
-    'particle': new ParticleTerrain()
-}
-
-
 class TheScene {
 
     private sceneConfig : SceneConfig;
@@ -60,13 +54,18 @@ class TheScene {
 
         // Set up the terrain generator used.
         var terrain = new EmptyGenerator();
-        if( this.sceneConfig.terrainType in TERRAIN_GENERATORS ) {
-            terrain = TERRAIN_GENERATORS[this.sceneConfig.terrainType];
+        if( this.sceneConfig.terrainType == 'particle' ) {
+            terrain = new ParticleTerrain(
+                this.sceneConfig.particleNumIslands ? this.sceneConfig.particleNumIslands : 1
+            );
+        } else if( this.sceneConfig.terrainType == 'random' ) {
+            terrain = new RandomTerrain();
         }
 
+        // Set up planet configuration
         let planetConfig = {
             radius: this.sceneConfig.planetRadius ? this.sceneConfig.planetRadius : 1.0,
-            detail: this.sceneConfig.planetDetail ? this.sceneConfig.planetDetail : 2
+            detail: this.sceneConfig.planetDetail ? this.sceneConfig.planetDetail : 10
         }
 
         // Set up the planet being used.
