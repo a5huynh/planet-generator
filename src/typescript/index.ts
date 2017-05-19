@@ -124,8 +124,8 @@ class TheScene {
 let app = new TheScene({
     sphereType: getParameterByName( 'sphereType' ),
     terrainType: getParameterByName( 'terrainType' ),
-    planetRadius: Number.parseInt( getParameterByName( 'planetRadius' ) ),
-    planetDetail: Number.parseInt( getParameterByName( 'planetDetail' ) ),
-    particleNumIslands: Number.parseInt( getParameterByName( 'particleNumIslands' ) ),
-    zoom: Number.parseInt( getParameterByName( 'zoom' ) )
+    planetRadius: parseInt( getParameterByName( 'planetRadius' ) ),
+    planetDetail: parseInt( getParameterByName( 'planetDetail' ) ),
+    particleNumIslands: parseInt( getParameterByName( 'particleNumIslands' ) ),
+    zoom: parseInt( getParameterByName( 'zoom' ) )
 });
