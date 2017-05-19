@@ -1,10 +1,23 @@
 import * as THREE from 'three';
 import { Planet, IsoPlanet, UVPlanet } from './geometry/planet';
+// Terrain generation
+import { TerrainGenerator, EmptyGenerator } from './terrain/base';
+import { ParticleTerrain } from './terrain/particle';
+import { RandomTerrain } from './terrain/random';
+// Helpful utils
 import { getParameterByName } from './utils';
 
 
 interface SceneConfig {
     sphereType: string;
+    terrainType: string;
+    planetDetail: number;
+    zoom: number;
+}
+
+let TERRAIN_GENERATORS: {[index:string]: TerrainGenerator} = {
+    'random': new RandomTerrain(),
+    'particle': new ParticleTerrain()
 }
 
 
@@ -15,11 +28,12 @@ class TheScene {
     private camera: THREE.PerspectiveCamera;
     private scene: THREE.Scene;
     private renderer: THREE.WebGLRenderer;
-    private planet: Planet;
 
+
+    private planet: Planet;
     private mesh: THREE.Object3D;
 
-    constructor( config: SceneConfig = { sphereType: 'iso' } ) {
+    constructor( config: SceneConfig ) {
 
         this.sceneConfig = config;
 
@@ -34,6 +48,27 @@ class TheScene {
             this.camera.updateProjectionMatrix();
         });
 
+        // Set up the terrain generator used.
+        var terrain = new EmptyGenerator();
+        if( this.sceneConfig.terrainType in TERRAIN_GENERATORS ) {
+            terrain = TERRAIN_GENERATORS[this.sceneConfig.terrainType];
+        }
+
+        // Set up the planet being used.
+        if( this.sceneConfig.sphereType == 'iso' ) {
+            this.planet = new IsoPlanet(
+                1.0,
+                this.sceneConfig.planetDetail ? this.sceneConfig.planetDetail : 2
+            );
+        } else {
+            this.planet = new UVPlanet(
+                1.0,
+                this.sceneConfig.planetDetail ? this.sceneConfig.planetDetail : 10
+            );
+        }
+
+        // Generate planet and setup scene
+        this.planet.generate( terrain );
         this.initScene();
         this.animate();
     }
@@ -56,20 +91,13 @@ class TheScene {
             new THREE.MeshBasicMaterial({ color: 0x55bbff, shading: THREE.FlatShading, wireframe: true })
         ]
 
-        if( this.sceneConfig.sphereType == 'iso' ) {
-            this.planet = new IsoPlanet( 2.0 );
-        } else {
-            this.planet = new UVPlanet( 2.0 );
-        }
-``
         // create a box and add it to the scene
         this.mesh = THREE.SceneUtils.createMultiMaterialObject( this.planet.geometry, materials );
         this.scene.add( this.mesh );
 
         this.camera.position.x = 0;
         this.camera.position.y = 0;
-        this.camera.position.z = 5;
-
+        this.camera.position.z = this.sceneConfig.zoom ? this.sceneConfig.zoom : 3;
         this.camera.lookAt( this.scene.position )
     }
 
@@ -79,11 +107,15 @@ class TheScene {
     }
 
     render = () => {
+        this.mesh.rotation.z += 0.01;
         this.mesh.rotation.y += 0.01;
         this.renderer.render( this.scene, this.camera );
     }
 }
 
 let app = new TheScene({
-    sphereType: getParameterByName( 'sphereType', window.location.href )
+    sphereType: getParameterByName( 'sphereType' ),
+    terrainType: getParameterByName( 'terrainType' ),
+    planetDetail: Number.parseInt( getParameterByName( 'planetDetail' ) ),
+    zoom: Number.parseInt( getParameterByName( 'zoom' ) )
 });
