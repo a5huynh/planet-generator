@@ -5,7 +5,6 @@ interface Planet {
 
     config: PlanetConfig;
     geometry: THREE.Geometry;
-
     generate( generator: TerrainGenerator ): void;
 }
 
@@ -27,6 +26,9 @@ class IsoPlanet implements Planet {
     private terrain: TerrainGenerator;
 
     constructor( public config: PlanetConfig ) {
+        // Since `iso` generation is a bit exponential, scale down
+        // the detail factor by a factor of 4 before we begin.
+        this.config.detail = Math.floor( this.config.detail / 4 );
         this.faces = new Array();
         this.geometry = new THREE.Geometry();
     }
