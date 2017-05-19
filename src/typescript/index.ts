@@ -95,8 +95,18 @@ class TheScene {
         this.scene.add( light );
 
         let materials = [
-            new THREE.MeshPhongMaterial({ color: 0x0099FF, shading: THREE.FlatShading, shininess: 0 }),
-            new THREE.MeshBasicMaterial({ color: 0x55bbff, shading: THREE.FlatShading, wireframe: true })
+            new THREE.MeshPhongMaterial({
+                color: 0x0099FF,
+                shading: THREE.FlatShading,
+                shininess: 0,
+                vertexColors: THREE.VertexColors
+            }),
+
+            new THREE.MeshBasicMaterial({
+                color: 0x55bbff,
+                shading: THREE.FlatShading,
+                wireframe: true
+            })
         ]
 
         // create a box and add it to the scene
