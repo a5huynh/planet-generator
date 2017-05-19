@@ -1,11 +1,25 @@
 const { CheckerPlugin } = require('awesome-typescript-loader');
-
+var webpack = require('webpack');
 var path = require( 'path' );
 
+// Production build?
+var PROD = (process.env.NODE_ENV === 'production');
+
+// Setup plugins
+var PLUGINS = [ new CheckerPlugin() ];
+if( PROD ) {
+  PLUGINS.push(
+    new webpack.optimize.UglifyJsPlugin({
+      compress: { warnings: false }
+    })
+  );
+}
+
+// Main build config
 module.exports = {
   entry: './src/typescript/index.ts',
   output: {
-    filename: './dist/webgl/bundle.js'
+    filename: PROD ? './dist/webgl/bundle.min.js' : './dist/webgl/bundle.js'
   },
   resolve: {
     // List of extensions to be tried when looking at imports
@@ -31,7 +45,5 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new CheckerPlugin(),
-  ]
+  plugins: PLUGINS
 }
