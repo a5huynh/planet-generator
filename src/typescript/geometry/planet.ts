@@ -3,10 +3,15 @@ import { TerrainGenerator } from '../terrain/base';
 
 interface Planet {
 
-    radius: number;
+    config: PlanetConfig;
     geometry: THREE.Geometry;
 
     generate( generator: TerrainGenerator ): void;
+}
+
+interface PlanetConfig {
+    radius: number;
+    detail: number;
 }
 
 /**
@@ -21,7 +26,7 @@ class IsoPlanet implements Planet {
     private faces: Array<THREE.Face3>;
     private terrain: TerrainGenerator;
 
-    constructor( public radius: number, public detail: number ) {
+    constructor( public config: PlanetConfig ) {
         this.faces = new Array();
         this.geometry = new THREE.Geometry();
     }
@@ -44,7 +49,7 @@ class IsoPlanet implements Planet {
 
     _refineGeometry() {
 
-        for( var i = 0; i < this.detail; i++ ) {
+        for( var i = 0; i < this.config.detail; i++ ) {
 
             let refinedFaces = new Array<THREE.Face3>();
 
@@ -146,7 +151,9 @@ class IsoPlanet implements Planet {
     }
 
     _normalizedVector( x: number, y: number, z:number ) {
-        return new THREE.Vector3( x, y, z ).normalize().multiplyScalar( this.radius );
+        return new THREE.Vector3( x, y, z )
+                        .normalize()
+                        .multiplyScalar( this.config.radius );
     }
 }
 
@@ -161,15 +168,15 @@ class UVPlanet implements Planet {
     public geometry: THREE.Geometry;
     private terrain: TerrainGenerator;
 
-    constructor( public radius: number, public detail: number ) {
+    constructor( public config: PlanetConfig ) {
         this.geometry = new THREE.Geometry();
     }
 
     generate( terrain: TerrainGenerator ) {
         this.terrain = terrain;
-        this.terrain.initialize( this.detail + 1, this.detail + 1);
+        this.terrain.initialize( this.config.detail + 1, this.config.detail + 1);
 
-        this._setupVertices( this.detail );
+        this._setupVertices( this.config.detail );
         this.geometry.computeFaceNormals();
         this.geometry.computeVertexNormals();
     }
@@ -212,7 +219,7 @@ class UVPlanet implements Planet {
                 // Horizontal
                 theta = col * thetaStep;
                 // Add vertice
-                let height = this.radius + this.terrain.getHeight( row, col );
+                let height = this.config.radius + this.terrain.getHeight( row, col );
                 this.geometry.vertices.push( this._vertex( theta, gamma, height ));
             }
         }

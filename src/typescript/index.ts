@@ -9,10 +9,20 @@ import { getParameterByName } from './utils';
 
 
 interface SceneConfig {
+    // Either `iso` or `uv`
     sphereType: string;
+    // Either `particle`, `random`, or `null` for no terrain.
     terrainType: string;
+    // The base height the planet.
+    planetRadius: number;
+    // The resolution of the generated planet.
     planetDetail: number;
+    // Zoom level of the camera.
     zoom: number;
+
+    // Used in the particle generator to indicate the number of islands
+    // to generate.
+    particleNumIslands: number;
 }
 
 let TERRAIN_GENERATORS: {[index:string]: TerrainGenerator} = {
@@ -54,17 +64,16 @@ class TheScene {
             terrain = TERRAIN_GENERATORS[this.sceneConfig.terrainType];
         }
 
+        let planetConfig = {
+            radius: this.sceneConfig.planetRadius ? this.sceneConfig.planetRadius : 1.0,
+            detail: this.sceneConfig.planetDetail ? this.sceneConfig.planetDetail : 2
+        }
+
         // Set up the planet being used.
         if( this.sceneConfig.sphereType == 'iso' ) {
-            this.planet = new IsoPlanet(
-                1.0,
-                this.sceneConfig.planetDetail ? this.sceneConfig.planetDetail : 2
-            );
+            this.planet = new IsoPlanet( planetConfig );
         } else {
-            this.planet = new UVPlanet(
-                1.0,
-                this.sceneConfig.planetDetail ? this.sceneConfig.planetDetail : 10
-            );
+            this.planet = new UVPlanet( planetConfig );
         }
 
         // Generate planet and setup scene
@@ -116,6 +125,8 @@ class TheScene {
 let app = new TheScene({
     sphereType: getParameterByName( 'sphereType' ),
     terrainType: getParameterByName( 'terrainType' ),
+    planetRadius: Number.parseInt( getParameterByName( 'planetRadius' ) ),
     planetDetail: Number.parseInt( getParameterByName( 'planetDetail' ) ),
+    particleNumIslands: Number.parseInt( getParameterByName( 'particleNumIslands' ) ),
     zoom: Number.parseInt( getParameterByName( 'zoom' ) )
 });
