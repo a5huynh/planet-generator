@@ -13,7 +13,7 @@ class ParticleTerrain implements TerrainGenerator {
     private numX: number;
     private numY: number;
 
-    constructor() {
+    constructor( private numIslands: number ) {
         this.displacement = 0.1;
     }
 
@@ -26,7 +26,7 @@ class ParticleTerrain implements TerrainGenerator {
             this.heightMap[i] = 0.0;
         }
 
-        this._generate( 1, 100 );
+        this._generate( 100 );
     }
 
     /**
@@ -35,9 +35,9 @@ class ParticleTerrain implements TerrainGenerator {
      * @param numIslands Number of separate land masses to create
      * @param iterations Number of displacements that will happen at each island
      */
-    _generate( numIslands: number, iterations: number ) {
+    _generate( iterations: number ) {
 
-        for( var i = 0; i < numIslands; i++ ) {
+        for( var i = 0; i < this.numIslands; i++ ) {
             // Find a random spot to grow an island
             var sx = this._randomInt( 0, this.numX - 1 );
             var sy = this._randomInt( 0, this.numY - 1 );
