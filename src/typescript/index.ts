@@ -96,16 +96,17 @@ class TheScene {
 
         let materials = [
             new THREE.MeshPhongMaterial({
-                color: 0x0099FF,
+                // color: 0x0099FF, // Colors are now assigned in planet generator.
                 shading: THREE.FlatShading,
                 shininess: 0,
                 vertexColors: THREE.VertexColors
             }),
 
             new THREE.MeshBasicMaterial({
-                color: 0x55bbff,
+                // color: 0x55bbff, // Colors are now assigned in planet generator.
                 shading: THREE.FlatShading,
-                wireframe: true
+                wireframe: true,
+                vertexColors: THREE.VertexColors
             })
         ]
 
