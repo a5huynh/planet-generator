@@ -24,6 +24,7 @@ class IsoPlanet implements Planet {
     public geometry: THREE.Geometry;
     private faces: Array<THREE.Face3>;
     private terrain: TerrainGenerator;
+    private terrain_size: number;
 
     constructor( public config: PlanetConfig ) {
         // Since `iso` generation is a bit exponential, scale down
@@ -35,7 +36,10 @@ class IsoPlanet implements Planet {
 
     generate( terrain: TerrainGenerator ) {
         this.terrain = terrain;
-        this.terrain.initialize( 10, 10 );
+
+        this.terrain_size = 12 * this.config.detail;
+        console.log(this.terrain_size);
+        this.terrain.initialize( this.terrain_size, this.terrain_size );
 
         this._setupInitialVertices();
         this._setupInitialFaces();
@@ -137,6 +141,39 @@ class IsoPlanet implements Planet {
 
     }
 
+    /**
+     * Converts a vertice to an x,y coordinate in our height map and
+     * returns the height at that location.
+     *
+     * Understanding the math: This is based on a polar projection onto 2D
+     * space. Normal vertices (x, y, z) gives u
+     *
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     * @memberof IsoPlanet
+     */
+    _getHeight( x: number, y: number, z:number ): number {
+        var hx = Math.atan2( x, z ) / ( -2.0 * Math.PI );
+        var hy = Math.asin( y ) / Math.PI + 0.5;
+
+        if ( hx < 0 ) {
+            hx += 1;
+        }
+
+        hx = Math.floor( hx * (this.terrain_size - 1) );
+        if( isNaN( hx ) ) {
+            hx = 0;
+        }
+
+        hy = Math.floor( hy * (this.terrain_size - 1) );
+        if( isNaN( hy ) ) {
+            hy = 0;
+        }
+
+        return this.terrain.getHeight( hx, hy );
+    }
+
     _getMidPoint( v1_idx: number, v2_idx: number ): number {
 
         let p1 = this.geometry.vertices[ v1_idx ];
@@ -153,9 +190,10 @@ class IsoPlanet implements Planet {
     }
 
     _normalizedVector( x: number, y: number, z:number ) {
+        var height = this.config.radius + this._getHeight( x, y, z );
         return new THREE.Vector3( x, y, z )
                         .normalize()
-                        .multiplyScalar( this.config.radius );
+                        .multiplyScalar( height );
     }
 }
 
