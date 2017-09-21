@@ -33,7 +33,7 @@ class Planet {
         } else if( height <= 1.05 ) {
             return new THREE.Color(0xffff00);
         // Grassland
-        } else if( height <= 1.10 ) {
+        } else if( height <= 1.15 ) {
             return new THREE.Color(0x00ff00);
         // Mountains
         } else {
@@ -83,7 +83,6 @@ class IsoPlanet extends Planet {
         this.terrain = terrain;
 
         this.terrain_size = 12 * this.config.detail;
-        console.log(this.terrain_size);
         this.terrain.initialize( this.terrain_size, this.terrain_size );
 
         this._setupInitialVertices();
@@ -199,21 +198,22 @@ class IsoPlanet extends Planet {
      * @memberof IsoPlanet
      */
     _getHeight( x: number, y: number, z:number ): number {
-        var hx = Math.atan2( x, z ) / ( -2.0 * Math.PI );
-        var hy = Math.asin( y ) / Math.PI + 0.5;
+        var hx = Math.atan2( x, y ) / ( -2.0 * Math.PI );
+        var hy = Math.asin( z ) / Math.PI + 0.5;
 
         if ( hx < 0 ) {
             hx += 1;
         }
 
         hx = Math.floor( hx * (this.terrain_size - 1) );
+        hy = Math.floor( hy * (this.terrain_size - 1) );
+        // Handle wrapping correctly.
         if( isNaN( hx ) ) {
-            hx = 0;
+            hx = this.terrain_size - 1;
         }
 
-        hy = Math.floor( hy * (this.terrain_size - 1) );
         if( isNaN( hy ) ) {
-            hy = 0;
+            hy = this.terrain_size - 1;
         }
 
         return this.terrain.getHeight( hx, hy );
