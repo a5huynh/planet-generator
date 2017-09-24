@@ -1,41 +1,95 @@
 import * as THREE from 'three';
 import { TerrainGenerator } from '../terrain/base';
 
-interface Planet {
-
-    config: PlanetConfig;
-    geometry: THREE.Geometry;
-    generate( generator: TerrainGenerator ): void;
-}
-
 interface PlanetConfig {
     radius: number;
     detail: number;
 }
 
-/**
- * IsoPlanet generator class.
- *
- * This object encapsulates everything that is needed to generate a random planet
- * using particle deposition and an icosahedron geometry.
- */
-class IsoPlanet implements Planet {
+
+class Planet {
 
     public geometry: THREE.Geometry;
-    private faces: Array<THREE.Face3>;
-    private terrain: TerrainGenerator;
+
+    faces: Array<THREE.Face3>;
+    terrain: TerrainGenerator;
 
     constructor( public config: PlanetConfig ) {
-        // Since `iso` generation is a bit exponential, scale down
-        // the detail factor by a factor of 4 before we begin.
-        this.config.detail = Math.floor( this.config.detail / 4 );
         this.faces = new Array();
         this.geometry = new THREE.Geometry();
     }
 
+    /**
+     * Calculates the color for a particular vertice based on the height.
+     *
+     * @param {number} height
+     * @returns {THREE.Color}
+     * @memberof Planet
+     */
+    _color( height: number ): THREE.Color {
+        // Ocean
+        if( height < 1.01 ) {
+            return new THREE.Color(0x55bbff);
+        // Sand
+        } else if( height <= 1.02 ) {
+            return new THREE.Color(0xffff00);
+        // Grassland
+        } else if( height <= 1.08 ) {
+            return new THREE.Color(0x00ff00);
+        // Mountains
+        } else {
+            return new THREE.Color(0xfffffff);
+        }
+
+    }
+
+    /**
+     * Returns a Face3 with colorized vertices based on the vertex lenght.
+     *
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     * @returns {THREE.Face3}
+     * @memberof Planet
+     */
+    _face( x: number, y: number, z: number ): THREE.Face3 {
+        let face = new THREE.Face3( x, y, z );
+        face.vertexColors[0] = this._color(this.geometry.vertices[face.a].length());
+        face.vertexColors[1] = this._color(this.geometry.vertices[face.a].length());
+        face.vertexColors[2] = this._color(this.geometry.vertices[face.a].length());
+        return face;
+    }
+
+    generate( generator: TerrainGenerator ): void {}
+}
+
+/**
+ * IcosaPlanet generator class.
+ *
+ * This object encapsulates everything that is needed to generate a random planet
+ * using particle deposition and an icosahedron geometry.
+ */
+class IcosaPlanet extends Planet {
+
+    private terrain_size: number;
+
+    constructor( public config: PlanetConfig ) {
+        super(config);
+        // Since `iso` generation is a bit exponential, scale down
+        // the detail factor by a factor of 4 before we begin.
+        this.config.detail = Math.floor( this.config.detail / 4 );
+
+        // Calculate how big our terrain map will be
+        // 12 is the initial number of faces, multipled by the number of
+        // faces created in each additional level of detail.
+        this.terrain_size = (20 * this.config.detail );
+        console.log(`Terrain Size: ${this.terrain_size}`);
+    }
+
     generate( terrain: TerrainGenerator ) {
         this.terrain = terrain;
-        this.terrain.initialize( 10, 10 );
+
+        this.terrain.initialize( this.terrain_size, this.terrain_size );
 
         this._setupInitialVertices();
         this._setupInitialFaces();
@@ -55,17 +109,17 @@ class IsoPlanet implements Planet {
 
             let refinedFaces = new Array<THREE.Face3>();
 
-            for( let triangle of this.faces ) {
+            for( let triangle of this.faces  ) {
                 // Replace the triangle with 4 new triangles.
                 let a = this._getMidPoint( triangle.a, triangle.b );
                 let b = this._getMidPoint( triangle.b, triangle.c );
                 let c = this._getMidPoint( triangle.c, triangle.a );
 
                 refinedFaces.push(
-                    new THREE.Face3( triangle.a, a, c ),
-                    new THREE.Face3( triangle.b, b, a ),
-                    new THREE.Face3( triangle.c, c, b ),
-                    new THREE.Face3( a, b, c ),
+                    this._face( triangle.a, a, c ),
+                    this._face( triangle.b, b, a ),
+                    this._face( triangle.c, c, b ),
+                    this._face( a, b, c ),
                 )
             }
 
@@ -74,37 +128,37 @@ class IsoPlanet implements Planet {
     }
 
     /**
-     * Create the initial 20 triangles of the icosahedron
+     * Create the initial 20 triangles of the icosahedron j
      */
     _setupInitialFaces( ) {
 
         // 5 faces around point 0
-        this.faces.push( new THREE.Face3(  0, 11,  5 ) );
-        this.faces.push( new THREE.Face3(  0,  5,  1 ) );
-        this.faces.push( new THREE.Face3(  0,  1,  7 ) );
-        this.faces.push( new THREE.Face3(  0,  7, 10 ) );
-        this.faces.push( new THREE.Face3(  0, 10, 11 ) );
+        this.faces.push( this._face(  0, 11,  5 ) );
+        this.faces.push( this._face(  0,  5,  1 ) );
+        this.faces.push( this._face(  0,  1,  7 ) );
+        this.faces.push( this._face(  0,  7, 10 ) );
+        this.faces.push( this._face(  0, 10, 11 ) );
 
         // 5 adjacent faces
-        this.faces.push( new THREE.Face3(  1,  5,  9 ) );
-        this.faces.push( new THREE.Face3(  5, 11,  4 ) );
-        this.faces.push( new THREE.Face3( 11, 10,  2 ) );
-        this.faces.push( new THREE.Face3( 10,  7,  6 ) );
-        this.faces.push( new THREE.Face3(  7,  1,  8 ) );
+        this.faces.push( this._face(  1,  5,  9 ) );
+        this.faces.push( this._face(  5, 11,  4 ) );
+        this.faces.push( this._face( 11, 10,  2 ) );
+        this.faces.push( this._face( 10,  7,  6 ) );
+        this.faces.push( this._face(  7,  1,  8 ) );
 
         // 5 faces around point 3
-        this.faces.push( new THREE.Face3(  3,  9,  4 ) );
-        this.faces.push( new THREE.Face3(  3,  4,  2 ) );
-        this.faces.push( new THREE.Face3(  3,  2,  6 ) );
-        this.faces.push( new THREE.Face3(  3,  6,  8 ) );
-        this.faces.push( new THREE.Face3(  3,  8,  9 ) );
+        this.faces.push( this._face(  3,  9,  4 ) );
+        this.faces.push( this._face(  3,  4,  2 ) );
+        this.faces.push( this._face(  3,  2,  6 ) );
+        this.faces.push( this._face(  3,  6,  8 ) );
+        this.faces.push( this._face(  3,  8,  9 ) );
 
         // 5 adjacent faces
-        this.faces.push( new THREE.Face3(  4,  9,  5 ) );
-        this.faces.push( new THREE.Face3(  2,  4, 11 ) );
-        this.faces.push( new THREE.Face3(  6,  2, 10 ) );
-        this.faces.push( new THREE.Face3(  8,  6,  7 ) );
-        this.faces.push( new THREE.Face3(  9,  8,  1 ) );
+        this.faces.push( this._face(  4,  9,  5 ) );
+        this.faces.push( this._face(  2,  4, 11 ) );
+        this.faces.push( this._face(  6,  2, 10 ) );
+        this.faces.push( this._face(  8,  6,  7 ) );
+        this.faces.push( this._face(  9,  8,  1 ) );
     }
 
     /**
@@ -137,6 +191,38 @@ class IsoPlanet implements Planet {
 
     }
 
+    /**
+     * Converts a vertice to an x,y coordinate in our height map and
+     * returns the height at that location.
+     *
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     * @memberof IcosaPlanet
+     */
+    _getHeight( x: number, y: number, z:number ): number {
+        var hx = Math.atan2( x, z ) / ( -2.0 * Math.PI );
+        var hy = Math.asin( y ) / Math.PI + 0.5;
+
+        if ( hx < 0 ) {
+            hx += 0.5;
+        }
+
+        hx = Math.floor( hx * (this.terrain_size - 1) );
+        hy = Math.floor( hy * (this.terrain_size - 1) );
+
+        // Handle wrapping correctly.
+        if( isNaN( hx ) ) {
+            hx = this.terrain_size - 1;
+        }
+
+        if( isNaN( hy ) ) {
+            hy = this.terrain_size - 1;
+        }
+
+        return this.terrain.getHeight( hx, hy );
+    }
+
     _getMidPoint( v1_idx: number, v2_idx: number ): number {
 
         let p1 = this.geometry.vertices[ v1_idx ];
@@ -152,10 +238,11 @@ class IsoPlanet implements Planet {
         return this.geometry.vertices.length - 1;
     }
 
-    _normalizedVector( x: number, y: number, z:number ) {
+    _normalizedVector( x: number, y: number, z:number ): THREE.Vector3 {
+        var height = this.config.radius + this._getHeight( x, y, z );
         return new THREE.Vector3( x, y, z )
                         .normalize()
-                        .multiplyScalar( this.config.radius );
+                        .multiplyScalar( height );
     }
 }
 
@@ -165,14 +252,7 @@ class IsoPlanet implements Planet {
  * This object encapsulates everything that is needed to generate a random planet
  * using particle deposition and an uv-sphere geometry.
  */
-class UVPlanet implements Planet {
-
-    public geometry: THREE.Geometry;
-    private terrain: TerrainGenerator;
-
-    constructor( public config: PlanetConfig ) {
-        this.geometry = new THREE.Geometry();
-    }
+class UVPlanet extends Planet {
 
     generate( terrain: TerrainGenerator ) {
         this.terrain = terrain;
@@ -239,11 +319,11 @@ class UVPlanet implements Planet {
                 // Bottom left
                 var i3 = ( i2 + 1 ) % ( numPoints * numPoints );
 
-                this.geometry.faces.push( new THREE.Face3( i0, i3, i1 ) );
-                this.geometry.faces.push( new THREE.Face3( i0, i2, i3 ) );
+                this.geometry.faces.push( this._face( i0, i3, i1 ) );
+                this.geometry.faces.push( this._face( i0, i2, i3 ) );
             }
         }
     }
 }
 
-export { Planet, IsoPlanet, UVPlanet };
+export { Planet, IcosaPlanet, UVPlanet };
