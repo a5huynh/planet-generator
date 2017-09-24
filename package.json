@@ -20,11 +20,11 @@
   },
   "homepage": "https://github.com/a5huynh/planet-generator#readme",
   "devDependencies": {
-    "@types/three": "^0.84.3",
+    "@types/three": "^0.84.22",
     "awesome-typescript-loader": "^3.1.2",
     "ts-node": "^3.0.2",
     "typedoc": "^0.8.0",
-    "webpack": "^3.5.6"
+    "webpack": "^3.6.0"
   },
   "dependencies": {
     "three.js": "^0.77.1"
