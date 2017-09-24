@@ -18,6 +18,7 @@ class Planet {
         this.faces = new Array();
         this.geometry = new THREE.Geometry();
     }
+
     /**
      * Calculates the color for a particular vertice based on the height.
      *
@@ -27,13 +28,13 @@ class Planet {
      */
     _color( height: number ): THREE.Color {
         // Ocean
-        if( height <= 1.01 ) {
+        if( height < 1.01 ) {
             return new THREE.Color(0x55bbff);
         // Sand
-        } else if( height <= 1.05 ) {
+        } else if( height <= 1.02 ) {
             return new THREE.Color(0xffff00);
         // Grassland
-        } else if( height <= 1.15 ) {
+        } else if( height <= 1.08 ) {
             return new THREE.Color(0x00ff00);
         // Mountains
         } else {
@@ -63,12 +64,12 @@ class Planet {
 }
 
 /**
- * IsoPlanet generator class.
+ * IcosaPlanet generator class.
  *
  * This object encapsulates everything that is needed to generate a random planet
  * using particle deposition and an icosahedron geometry.
  */
-class IsoPlanet extends Planet {
+class IcosaPlanet extends Planet {
 
     private terrain_size: number;
 
@@ -77,12 +78,17 @@ class IsoPlanet extends Planet {
         // Since `iso` generation is a bit exponential, scale down
         // the detail factor by a factor of 4 before we begin.
         this.config.detail = Math.floor( this.config.detail / 4 );
+
+        // Calculate how big our terrain map will be
+        // 12 is the initial number of faces, multipled by the number of
+        // faces created in each additional level of detail.
+        this.terrain_size = (20 * this.config.detail );
+        console.log(`Terrain Size: ${this.terrain_size}`);
     }
 
     generate( terrain: TerrainGenerator ) {
         this.terrain = terrain;
 
-        this.terrain_size = 12 * this.config.detail;
         this.terrain.initialize( this.terrain_size, this.terrain_size );
 
         this._setupInitialVertices();
@@ -103,7 +109,7 @@ class IsoPlanet extends Planet {
 
             let refinedFaces = new Array<THREE.Face3>();
 
-            for( let triangle of this.faces ) {
+            for( let triangle of this.faces  ) {
                 // Replace the triangle with 4 new triangles.
                 let a = this._getMidPoint( triangle.a, triangle.b );
                 let b = this._getMidPoint( triangle.b, triangle.c );
@@ -189,24 +195,22 @@ class IsoPlanet extends Planet {
      * Converts a vertice to an x,y coordinate in our height map and
      * returns the height at that location.
      *
-     * Understanding the math: This is based on a polar projection onto 2D
-     * space. Normal vertices (x, y, z) gives u
-     *
      * @param {number} x
      * @param {number} y
      * @param {number} z
-     * @memberof IsoPlanet
+     * @memberof IcosaPlanet
      */
     _getHeight( x: number, y: number, z:number ): number {
-        var hx = Math.atan2( x, y ) / ( -2.0 * Math.PI );
-        var hy = Math.asin( z ) / Math.PI + 0.5;
+        var hx = Math.atan2( x, z ) / ( -2.0 * Math.PI );
+        var hy = Math.asin( y ) / Math.PI + 0.5;
 
         if ( hx < 0 ) {
-            hx += 1;
+            hx += 0.5;
         }
 
         hx = Math.floor( hx * (this.terrain_size - 1) );
         hy = Math.floor( hy * (this.terrain_size - 1) );
+
         // Handle wrapping correctly.
         if( isNaN( hx ) ) {
             hx = this.terrain_size - 1;
@@ -322,4 +326,4 @@ class UVPlanet extends Planet {
     }
 }
 
-export { Planet, IsoPlanet, UVPlanet };
+export { Planet, IcosaPlanet, UVPlanet };

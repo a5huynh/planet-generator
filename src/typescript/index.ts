@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Planet, IsoPlanet, UVPlanet } from './geometry/planet';
+import { Planet, IcosaPlanet, UVPlanet } from './geometry/planet';
 // Terrain generation
 import { TerrainGenerator, EmptyGenerator } from './terrain/base';
 import { ParticleTerrain } from './terrain/particle';
@@ -70,7 +70,7 @@ class TheScene {
 
         // Set up the planet being used.
         if( this.sceneConfig.sphereType == 'iso' ) {
-            this.planet = new IsoPlanet( planetConfig );
+            this.planet = new IcosaPlanet( planetConfig );
         } else {
             this.planet = new UVPlanet( planetConfig );
         }
