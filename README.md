@@ -38,3 +38,17 @@ All code is MIT licensed, so go ahead and use it in your next great game or
 [cse169]: http://graphics.ucsd.edu/twiki/bin/view.pl/Classes/CSE167F09-FinalProjects "CSE 167 Final Projects"
 [cse169results]: http://a5huynh.github.io/2009/12/12/cse-167-final-project-results.html "CSE 167 Results"
 [pdepo]: https://web.archive.org/web/20160307062357/http://www.lighthouse3d.com/opengl/terrain/index.php3?particle "Particle Deposition"
+
+
+### typescript updates (2017)
+
+In the year 2017, I decided to revisit portions of the planet generation code and
+complete some updates I've been meaning to do for several years. You can check out
+the code under the [`src/typescript`](src/typescript) directory and if you're interested in reading
+a walkthrough of my thoughts and explanations feel free to check out the following:
+
+- [Planet Rendering Pt. 1][blog-post-1]
+- [Planet Rendering Pt. 2][blog-post-2]
+
+[blog-post-1]: https://a5huynh.github.io/2017/05/18/tbt-planet-rendering.html "TBT: Planet Rendering"
+[blog-post-2]: https://a5huynh.github.io/2017/09/24/planet-rendering-pt-2.html "Planet Rendering Pt. 2"
