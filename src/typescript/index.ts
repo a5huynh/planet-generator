@@ -5,7 +5,7 @@ import { TerrainGenerator, EmptyGenerator } from './terrain/base';
 import { ParticleTerrain } from './terrain/particle';
 import { RandomTerrain } from './terrain/random';
 // Helpful utils
-import { getParameterByName } from './utils';
+import { createMultiMaterialObject, getParameterByName } from './utils';
 
 
 interface SceneConfig {
@@ -97,21 +97,21 @@ class TheScene {
         let materials = [
             new THREE.MeshPhongMaterial({
                 // color: 0x0099FF, // Colors are now assigned in planet generator.
-                shading: THREE.FlatShading,
+                // shading: THREE.FlatShading,
                 shininess: 0,
                 vertexColors: THREE.VertexColors
             }),
 
             new THREE.MeshBasicMaterial({
                 // color: 0x55bbff, // Colors are now assigned in planet generator.
-                shading: THREE.FlatShading,
+                // shading: THREE.FlatShading,
                 wireframe: true,
                 vertexColors: THREE.VertexColors
             })
         ]
 
         // create a box and add it to the scene
-        this.mesh = THREE.SceneUtils.createMultiMaterialObject( this.planet.geometry, materials );
+        this.mesh = createMultiMaterialObject( this.planet.geometry, materials );
         this.scene.add( this.mesh );
 
         this.camera.position.x = 0;
