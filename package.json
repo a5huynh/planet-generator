@@ -1,6 +1,6 @@
 {
   "name": "planet-generator",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Generate a planet using WebGL",
   "main": "index.js",
   "scripts": {
@@ -20,13 +20,17 @@
   },
   "homepage": "https://github.com/a5huynh/planet-generator#readme",
   "devDependencies": {
-    "@types/three": "^0.84.22",
-    "awesome-typescript-loader": "^3.1.2",
-    "ts-node": "^3.0.2",
+    "@types/three": "0.103.2",
+    "awesome-typescript-loader": "5.2.1",
+    "eslint": "^6.6.0",
+    "source-map-loader": "^0.2.4",
+    "ts-node": "8.5.2",
     "typedoc": "^0.8.0",
-    "webpack": "^3.6.0"
+    "typescript": "^3.7.2",
+    "webpack": "4.41.2",
+    "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "three.js": "^0.77.1"
+    "three": "0.110.0"
   }
 }
