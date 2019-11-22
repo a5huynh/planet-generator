@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 
 function getParameterByName( name: string ) {
     let url = window.location.href;
@@ -13,4 +14,20 @@ function getParameterByName( name: string ) {
     return decodeURIComponent( results[2].replace( /\+/g, ' ' ) );
 }
 
-export { getParameterByName };
+
+function createMultiMaterialObject(
+    geometry: THREE.Geometry,
+    materials: THREE.Material[]
+): THREE.Group {
+    let group = new THREE.Group();
+    for (let i = 0, l = materials.length; i < l; i++) {
+        group.add( new THREE.Mesh( geometry, materials[i] ) );
+    }
+
+    return group;
+}
+
+export {
+    createMultiMaterialObject,
+    getParameterByName
+};
