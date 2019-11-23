@@ -4,6 +4,9 @@ __Author__: Andrew Huynh
 
 __License__: MIT
 
+
+![example-planet gif](docs/example-planet.gif)
+
 ### a little history
 
 Back when I was a wee lad, around the years of 2008-2009, I wanted to
