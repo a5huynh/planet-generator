@@ -53,5 +53,5 @@ a walkthrough of my thoughts and explanations feel free to check out the followi
 - [Planet Rendering Pt. 1][blog-post-1]
 - [Planet Rendering Pt. 2][blog-post-2]
 
-[blog-post-1]: https://a5huynh.github.io/2017/tbt-planet-rendering/ "TBT: Planet Rendering"
-[blog-post-2]: https://a5huynh.github.io/2017/planet-rendering-pt-2/ "Planet Rendering Pt. 2"
+[blog-post-1]: https://a5huynh.github.io/posts/2017/tbt-planet-rendering/ "TBT: Planet Rendering"
+[blog-post-2]: https://a5huynh.github.io/posts/2017/planet-rendering-pt-2/ "Planet Rendering Pt. 2"
