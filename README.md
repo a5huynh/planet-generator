@@ -39,7 +39,7 @@ All code is MIT licensed, so go ahead and use it in your next great game or
 
 [3js]: http://threejs.org/
 [cse169]: http://graphics.ucsd.edu/twiki/bin/view.pl/Classes/CSE167F09-FinalProjects "CSE 167 Final Projects"
-[cse169results]: http://a5huynh.github.io/2009/12/12/cse-167-final-project-results.html "CSE 167 Results"
+[cse169results]: https://a5huynh.github.io/posts/2009/cse-167-final-project-results/
 [pdepo]: https://web.archive.org/web/20160307062357/http://www.lighthouse3d.com/opengl/terrain/index.php3?particle "Particle Deposition"
 
 
