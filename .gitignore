@@ -1,2 +1,5 @@
 node_modules
 .vscode
+
+# Dev bundles
+dist/webgl/bundle.js

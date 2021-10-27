@@ -16,7 +16,7 @@ function getParameterByName( name: string ) {
 
 
 function createMultiMaterialObject(
-    geometry: THREE.Geometry,
+    geometry: THREE.BufferGeometry,
     materials: THREE.Material[]
 ): THREE.Group {
     let group = new THREE.Group();

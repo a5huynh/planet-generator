@@ -90,8 +90,8 @@ class TheScene {
         let light = new THREE.AmbientLight( 0x404040 );
         this.scene.add( light );
 
-        light = new THREE.DirectionalLight( 0xffffff );
-        light.position.set( 5, 5, 0 );
+        let dirlight = new THREE.DirectionalLight( 0xffffff );
+        dirlight.position.set( 5, 5, 0 );
         this.scene.add( light );
 
         let materials = [
@@ -99,14 +99,14 @@ class TheScene {
                 // color: 0x0099FF, // Colors are now assigned in planet generator.
                 // shading: THREE.FlatShading,
                 shininess: 0,
-                vertexColors: THREE.VertexColors
+                // vertexColors: THREE.VertexColors
             }),
 
             new THREE.MeshBasicMaterial({
                 // color: 0x55bbff, // Colors are now assigned in planet generator.
                 // shading: THREE.FlatShading,
                 wireframe: true,
-                vertexColors: THREE.VertexColors
+                // vertexColors: THREE.VertexColors
             })
         ]
 

@@ -9,14 +9,15 @@ interface PlanetConfig {
 
 class Planet {
 
-    public geometry: THREE.Geometry;
+    public geometry: THREE.BufferGeometry;
+    public vertices: Array<THREE.Vector3>;
 
-    faces: Array<THREE.Face3>;
+    faces: Array<THREE.Face>;
     terrain: TerrainGenerator;
 
     constructor( public config: PlanetConfig ) {
         this.faces = new Array();
-        this.geometry = new THREE.Geometry();
+        this.geometry = new THREE.BufferGeometry();
     }
 
     /**
@@ -49,14 +50,14 @@ class Planet {
      * @param {number} x
      * @param {number} y
      * @param {number} z
-     * @returns {THREE.Face3}
+     * @returns {THREE.Face}
      * @memberof Planet
      */
-    _face( x: number, y: number, z: number ): THREE.Face3 {
-        let face = new THREE.Face3( x, y, z );
-        face.vertexColors[0] = this._color(this.geometry.vertices[face.a].length());
-        face.vertexColors[1] = this._color(this.geometry.vertices[face.a].length());
-        face.vertexColors[2] = this._color(this.geometry.vertices[face.a].length());
+    _face( x: number, y: number, z: number ): THREE.Face {
+        let face = new THREE.Face( x, y, z );
+        face.vertexColors[0] = this._color(this.vertices[face.a].length());
+        face.vertexColors[1] = this._color(this.vertices[face.a].length());
+        face.vertexColors[2] = this._color(this.vertices[face.a].length());
         return face;
     }
 
@@ -107,7 +108,7 @@ class IcosaPlanet extends Planet {
 
         for( var i = 0; i < this.config.detail; i++ ) {
 
-            let refinedFaces = new Array<THREE.Face3>();
+            let refinedFaces = new Array<THREE.Face>();
 
             for( let triangle of this.faces  ) {
                 // Replace the triangle with 4 new triangles.
@@ -168,21 +169,21 @@ class IcosaPlanet extends Planet {
     _setupInitialVertices() {
         let t = ( 1 + Math.sqrt(5.0)) / 2.0;
 
-        this.geometry.vertices.push(
+        this.vertices.push(
             this._normalizedVector( -1,  t,  0 ),
             this._normalizedVector(  1,  t,  0 ),
             this._normalizedVector( -1, -t,  0 ),
             this._normalizedVector(  1, -t,  0 ),
         );
 
-        this.geometry.vertices.push(
+        this.vertices.push(
             this._normalizedVector(  0, -1,  t ),
             this._normalizedVector(  0,  1,  t ),
             this._normalizedVector(  0, -1, -t ),
             this._normalizedVector(  0,  1, -t ),
         );
 
-        this.geometry.vertices.push(
+        this.vertices.push(
             this._normalizedVector(  t,  0, -1 ),
             this._normalizedVector(  t,  0,  1 ),
             this._normalizedVector( -t,  0, -1 ),
@@ -225,8 +226,8 @@ class IcosaPlanet extends Planet {
 
     _getMidPoint( v1_idx: number, v2_idx: number ): number {
 
-        let p1 = this.geometry.vertices[ v1_idx ];
-        let p2 = this.geometry.vertices[ v2_idx ];
+        let p1 = this.vertices[v1_idx];
+        let p2 = this.vertices[v2_idx];
 
         let new_vertex = this._normalizedVector(
             ( p1.x + p2.x ) / 2.0,
@@ -234,8 +235,8 @@ class IcosaPlanet extends Planet {
             ( p1.z + p2.z ) / 2.0
         );
 
-        this.geometry.vertices.push( new_vertex );
-        return this.geometry.vertices.length - 1;
+        this.vertices.push( new_vertex );
+        return this.vertices.length - 1;
     }
 
     _normalizedVector( x: number, y: number, z:number ): THREE.Vector3 {
@@ -302,7 +303,7 @@ class UVPlanet extends Planet {
                 theta = col * thetaStep;
                 // Add vertice
                 let height = this.config.radius + this.terrain.getHeight( row, col );
-                this.geometry.vertices.push( this._vertex( theta, gamma, height ));
+                this.vertices.push( this._vertex( theta, gamma, height ));
             }
         }
 
